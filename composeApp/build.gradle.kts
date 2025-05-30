@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    id("org.jetbrains.kotlin.native.cocoapods")
 }
 
 kotlin {
@@ -16,7 +17,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -25,14 +26,36 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            freeCompilerArgs += listOf("-g") // ✅ Enable debug symbol generation
         }
     }
-    
+
+    cocoapods {
+        summary = "FloveItControl iOS Framework"
+        homepage = "https://floveit.com"
+        version = "1.0"
+        ios.deploymentTarget = "15.0"
+        podfile = project.file("../iosApp/Podfile")      // 👈 👈 👈 MISSING in your file!
+        framework {
+            baseName = "ComposeApp"
+            isStatic = true
+        }
+
+    }
+
+
+
     sourceSets {
         
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.camera.camera2)
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
+            implementation("androidx.compose.material:material-icons-extended:1.7.8")
+            implementation ("com.google.mlkit:barcode-scanning:17.3.0")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -43,11 +66,12 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4-native-mt")
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.multiplatform.settings)
+            implementation(libs.kotlinx.serialization.json)
+
         }
-        iosMain.dependencies {
-            
-        }
+
     }
 }
 
@@ -79,6 +103,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.lifecycle)
     debugImplementation(compose.uiTooling)
 }
 

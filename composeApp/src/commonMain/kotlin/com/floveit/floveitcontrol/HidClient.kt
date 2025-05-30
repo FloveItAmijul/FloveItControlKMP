@@ -11,10 +11,19 @@ import kotlinx.coroutines.flow.StateFlow
  */
 interface HidClient {
     val isConnected: StateFlow<Boolean>
+    val serverMessage: StateFlow<String>
+    val deviceName: StateFlow<String>
+    val deviceID: StateFlow<String>
     suspend fun discover()
-    suspend fun send(data: String)
+    suspend fun send(data: String): Boolean
     fun disconnect()
+
 }
+
+interface WindowController {
+    fun enableImmersiveMode()
+}
+
 
 /**
  * Factory: platform modules must supply one.
