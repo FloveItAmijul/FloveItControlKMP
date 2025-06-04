@@ -1,6 +1,6 @@
 @file:OptIn(
-    kotlinx.cinterop.ExperimentalForeignApi::class,
-    kotlinx.cinterop.BetaInteropApi::class
+    ExperimentalForeignApi::class,
+    BetaInteropApi::class
 )
 package com.floveit.floveitcontrol
 
@@ -15,7 +15,7 @@ actual fun provideHidClient(): HidClient = IosHidClient()
 
 class IosHidClient : HidClient {
     companion object {
-        private const val SERVICE_NAME = "FloveIt"
+
         private const val SERVICE_TYPE = "_hidserver._tcp."
     }
 
@@ -28,6 +28,8 @@ class IosHidClient : HidClient {
     override val deviceName: StateFlow<String>     = _deviceName
     private val _deviceID      = MutableStateFlow("")
     override val deviceID: StateFlow<String>       = _deviceID
+    private val _findingMirror = MutableStateFlow(false)
+    override val findingMirror: StateFlow<Boolean> = _findingMirror
 
     //–– retry scope
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -44,7 +46,8 @@ class IosHidClient : HidClient {
         getDeviceInfo()
     }
 
-    override suspend fun discover(): Unit = withContext(Dispatchers.Main) {
+    override suspend fun discover(deviceName: String): Unit = withContext(Dispatchers.Main) {
+        _findingMirror.value = true
         // 1) tear down anything we had
         services.keys.toList().forEach(::disconnectService)
         netBrowser?.run { delegate = null; stop() }
@@ -57,7 +60,7 @@ class IosHidClient : HidClient {
                 moreComing: Boolean
             ) {
                 val name = didFindService.name
-                if (name.contains(SERVICE_NAME) && !services.containsKey(name)) {
+                if (name.contains(deviceName) && !services.containsKey(name)) {
                     services[name] = didFindService
 
                     didFindService.delegate = object : NSObject(), NSNetServiceDelegateProtocol {
@@ -70,7 +73,7 @@ class IosHidClient : HidClient {
                             // on failure, retry entire discovery
                             scope.launch {
                                 delay(500)
-                                discover()
+                                discover(deviceName)
                             }
                         }
                     }
@@ -78,11 +81,15 @@ class IosHidClient : HidClient {
                 }
             }
             override fun netServiceBrowserWillSearch(browser: NSNetServiceBrowser) {}
-            override fun netServiceBrowserDidStopSearch(browser: NSNetServiceBrowser) {}
+            override fun netServiceBrowserDidStopSearch(browser: NSNetServiceBrowser) {
+                _findingMirror.value = false
+            }
             override fun netServiceBrowser(
                 browser: NSNetServiceBrowser,
                 didNotSearch: Map<Any?, *>
-            ) {}
+            ) {
+                _findingMirror.value = false
+            }
         }
 
         // 3) start browsing
@@ -159,21 +166,46 @@ class IosHidClient : HidClient {
         }
     }
 
-    override suspend fun send(data: String): Boolean = withContext(Dispatchers.Default) {
-        if (outputStreams.isEmpty()) return@withContext false
-        val payload = (data + "\n").encodeToByteArray()
-        payload.usePinned { pinned ->
-            val ptr = pinned.addressOf(0).reinterpret<UByteVar>()
-            outputStreams.forEach { (name, out) ->
-                try {
-                    out.write(ptr, payload.size.convert())
-                } catch (_: Throwable) {
-                    disconnectService(name)
-                }
+//    override suspend fun send(data: String): Boolean = withContext(Dispatchers.Default) {
+//        if (outputStreams.isEmpty()) return@withContext false
+//        val payload = (data + "\n").encodeToByteArray()
+//        payload.usePinned { pinned ->
+//            val ptr = pinned.addressOf(0).reinterpret<UByteVar>()
+//            outputStreams.forEach { (name, out) ->
+//                try {
+//                    out.write(ptr, payload.size.convert())
+//                } catch (_: Throwable) {
+//                    disconnectService(name)
+//                }
+//            }
+//        }
+//        true
+//    }
+override suspend fun send(data: String): Boolean = withContext(Dispatchers.Default) {
+    // If there are no open output streams, bail out immediately
+    if (outputStreams.isEmpty()) return@withContext false
+
+    val payload = (data + "\n").encodeToByteArray()
+    payload.usePinned { pinned ->
+        val ptr = pinned.addressOf(0).reinterpret<UByteVar>()
+        // Iterate a copy of the keys so we can remove while iterating
+        val iterator = outputStreams.entries.iterator()
+        while (iterator.hasNext()) {
+            val (name, out) = iterator.next()
+            try {
+                out.write(ptr, payload.size.convert())
+            } catch (_: Throwable) {
+                // Tear down this service if write fails
+                disconnectService(name)
+                iterator.remove()
             }
         }
-        true
     }
+
+    // Return true if at least one stream remains (i.e. we “sent” to something)
+    return@withContext outputStreams.isNotEmpty()
+}
+
 
     override fun disconnect() {
         // cancel retries
@@ -184,6 +216,17 @@ class IosHidClient : HidClient {
         netBrowser?.run { stop(); delegate = null }
         netBrowser = null
         _isConnected.value = false
+        _findingMirror.value = false
+
+    }
+
+    override fun disconnectMirror(key: String) {
+        disconnectService(key)
+    }
+
+
+    override fun lookupKeyForServiceName(serviceName: String): String? {
+        return if (services.containsKey(serviceName)) serviceName else null
     }
 
     private fun disconnectService(name: String) {
@@ -221,3 +264,11 @@ class IosHidClient : HidClient {
         _deviceID.value   = uuid
     }
 }
+
+
+
+
+
+
+
+

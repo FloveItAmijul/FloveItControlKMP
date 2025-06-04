@@ -18,7 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.*
 import com.floveit.floveitcontrol.platformSpecific.isAndroid
-import com.floveit.floveitcontrol.viewmodel.FloveItControlViewModel
+import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
 import com.floveit.floveitcontrol.wifihid.helperfunction.AmijulSlider
 import com.floveit.floveitcontrol.wifihid.helperfunction.ScalableButton
 import com.floveit.floveitcontrol.wifihid.helperfunction.TouchPadTwo
@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
 
 @Composable
-fun WifiHidScreen(modifier: Modifier = Modifier ,viewModel: FloveItControlViewModel) {
+fun WifiHidScreen(modifier: Modifier = Modifier ,viewModel: FLoveItControlViewModel) {
 
     val scope = rememberCoroutineScope()
     var text by remember { mutableStateOf("") }

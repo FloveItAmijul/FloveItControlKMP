@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
+
     id("org.jetbrains.kotlin.native.cocoapods")
 }
 
@@ -69,7 +71,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.multiplatform.settings)
             implementation(libs.kotlinx.serialization.json)
-
+            implementation("cafe.adriel.voyager:voyager-navigator:1.1.0-beta03")
         }
 
     }
@@ -82,6 +84,7 @@ android {
     defaultConfig {
         applicationId = "com.floveit.floveitcontrol"
         minSdk = libs.versions.android.minSdk.get().toInt()
+        //noinspection OldTargetApi
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"

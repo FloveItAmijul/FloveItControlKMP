@@ -10,13 +10,16 @@ import kotlinx.coroutines.flow.StateFlow
  *  - `disconnect()` tears down
  */
 interface HidClient {
+    val findingMirror: StateFlow<Boolean>
     val isConnected: StateFlow<Boolean>
     val serverMessage: StateFlow<String>
     val deviceName: StateFlow<String>
     val deviceID: StateFlow<String>
-    suspend fun discover()
+    suspend fun discover(deviceName: String)
     suspend fun send(data: String): Boolean
     fun disconnect()
+    fun lookupKeyForServiceName(serviceName: String): String?
+    fun disconnectMirror(key: String)
 
 }
 

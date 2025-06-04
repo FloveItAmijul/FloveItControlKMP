@@ -18,6 +18,7 @@ import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import android.os.Handler
 import android.os.Looper
+import com.floveit.floveitcontrol.settings.mirrors.MirrorDevice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,15 +27,18 @@ class AndroidHidClient(private val context: Context) : HidClient {
     companion object {
         private const val TAG = "HidClient"
         private const val SERVICE_TYPE = "_hidserver._tcp."
-        private const val SERVICE_NAME = "FloveIt"
+        private const val SERVICE_NAME = "FLoveIt"
     }
 
     // hold all available server
     private val _availableServers = MutableStateFlow<List<String>>(emptyList())
     val availableServers: StateFlow<List<String>> get() = _availableServers.asStateFlow()
     // 2) The one the user has picked
-    private val _selectedServer = MutableStateFlow<String?>(null)
-    val selectedServer: StateFlow<String?> get() = _selectedServer
+    private val _findingMirror = MutableStateFlow(false)
+    override val findingMirror: StateFlow<Boolean> get() = _findingMirror.asStateFlow()
+
+    // At the top of AndroidHidClient:
+    private val serviceNameToKey = mutableMapOf<String, String>()
 
    // private var readJob: Job? = null
     private val readJobs = ConcurrentHashMap<String , Job>()
@@ -58,12 +62,8 @@ class AndroidHidClient(private val context: Context) : HidClient {
     init { getDeviceInfo() }
 
 
-    fun selectServer(key: String){
-        if(connections.containsKey(key)){
-            _selectedServer.value = key
-        }
-    }
-    override suspend fun discover(): Unit = withContext(Dispatchers.IO) {
+
+    override suspend fun discover(deviceName: String): Unit = withContext(Dispatchers.IO) {
         // ─── 1) Stop any existing discovery ─────────────────────────────────
         discoveryListener?.let { old ->
             Log.d(TAG, "Stopping previous discovery (if any)")
@@ -82,11 +82,14 @@ class AndroidHidClient(private val context: Context) : HidClient {
             }
             override fun onStopDiscoveryFailed(type: String?, code: Int) {
                 Log.e(TAG, "StopDiscoveryFailed: $code")
+                _findingMirror.value = false
             }
             override fun onDiscoveryStarted(type: String?) {
+                _findingMirror.value = true
                 Log.d(TAG, "Discovery started")
             }
             override fun onDiscoveryStopped(type: String?) {
+                _findingMirror.value = false
                 Log.d(TAG, "Discovery stopped")
             }
 
@@ -109,7 +112,7 @@ class AndroidHidClient(private val context: Context) : HidClient {
                 val svc = info ?: return
                 val name = svc.serviceName
                 Log.d(TAG, "Service found: $name")
-                if (!name.contains(SERVICE_NAME)) return
+                if (!name.contains(deviceName)) return
 
                 Log.d(TAG, "Resolving $name…")
                 nsd.resolveService(svc, object : NsdManager.ResolveListener {
@@ -159,6 +162,7 @@ class AndroidHidClient(private val context: Context) : HidClient {
 
             val sock = Socket(si.host , si.port).apply { keepAlive = true }
             connections[key] = sock
+            serviceNameToKey[si.serviceName] = key
             _isConnected.value = connections.isNotEmpty()
             _availableServers.value = connections.keys.toList()
 
@@ -188,19 +192,84 @@ class AndroidHidClient(private val context: Context) : HidClient {
         }
     }
 
+//    override suspend fun send(data: String): Boolean = withContext(Dispatchers.IO) {
+//        if(connections.isEmpty()) return@withContext false
+//        connections.values.forEach { sock ->
+//            try {
+//                sock.getOutputStream().writer().apply {
+//                    write("$data\n"); flush()
+//                }
+//                Log.d(TAG, "Sent to ${sock.inetAddress.hostAddress}: $data")
+//            } catch (e: IOException){
+//                Log.e(TAG, "Send failed on ${sock.inetAddress.hostAddress}", e)
+//            }
+//        }
+//        true
+//    }
+
     override suspend fun send(data: String): Boolean = withContext(Dispatchers.IO) {
-        if(connections.isEmpty()) return@withContext false
-        connections.values.forEach { sock ->
+        // If there are no active connections, bail out immediately
+        if (connections.isEmpty()) return@withContext false
+
+        var sentAtLeastOnce = false
+
+        // Iterate with an iterator so we can remove dead sockets on the fly
+        val iterator = connections.entries.iterator()
+        while (iterator.hasNext()) {
+            val (key, sock) = iterator.next()
+
+            // 1) If the socket is already closed or not connected, remove it and continue
+            if (sock.isClosed || !sock.isConnected) {
+                closeQuietly(sock)
+                iterator.remove()
+                continue
+            }
+
+            // 2) Attempt to write; if it fails, we assume the socket is dead
             try {
                 sock.getOutputStream().writer().apply {
-                    write("$data\n"); flush()
+                    write("$data\n")
+                    flush()
                 }
                 Log.d(TAG, "Sent to ${sock.inetAddress.hostAddress}: $data")
-            } catch (e: IOException){
+                sentAtLeastOnce = true
+            } catch (e: IOException) {
                 Log.e(TAG, "Send failed on ${sock.inetAddress.hostAddress}", e)
+                // Close and remove this socket
+                closeQuietly(sock)
+                iterator.remove()
             }
         }
-        true
+
+        // 3) Update the “connected” flag: true if any socket remains
+        _isConnected.value = connections.isNotEmpty()
+
+        return@withContext sentAtLeastOnce
+    }
+
+    private fun closeQuietly(socket: Socket) {
+        try {
+            socket.close()
+        } catch (_: Throwable) {
+            // ignore
+        }
+    }
+
+    override fun disconnectMirror(key: String){
+        readJobs.remove(key)?.cancel()
+        connections.remove(key)?.let { sock ->
+            try {
+                sock.close()
+            }catch (_: Throwable){}
+        }
+
+        serviceNameToKey.entries.removeAll { it.value == key}
+
+        _isConnected.value = connections.isNotEmpty()
+    }
+
+    override fun lookupKeyForServiceName(serviceName: String): String? {
+        return serviceNameToKey[serviceName]
     }
 
     override fun disconnect() {
@@ -216,10 +285,11 @@ class AndroidHidClient(private val context: Context) : HidClient {
         readJobs.clear()
         connections.clear()
         _isConnected.value = connections.isNotEmpty()
+        _findingMirror.value = false
         discoveryListener?.let { old ->
             Log.d(TAG, "Stopping discovery (disconnect)")
             try {
-                               nsd.stopServiceDiscovery(old)
+                nsd.stopServiceDiscovery(old)
             } catch (iae: IllegalArgumentException) {
                 Log.w(TAG, "stopServiceDiscovery: listener not registered, ignoring")
             }
@@ -245,3 +315,16 @@ class AndroidHidClient(private val context: Context) : HidClient {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

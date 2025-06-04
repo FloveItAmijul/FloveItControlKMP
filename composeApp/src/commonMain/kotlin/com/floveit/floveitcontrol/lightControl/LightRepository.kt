@@ -1,6 +1,7 @@
 package com.floveit.floveitcontrol.lightControl
 
 import com.floveit.floveitcontrol.HidClient
+import com.floveit.floveitcontrol.settings.mirrors.MirrorDevice
 import com.floveit.floveitcontrol.platformSpecific.provideSettings
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.*
@@ -13,14 +14,21 @@ class LightRepository(
 ) {
     companion object {
         private const val AUTH = "isLoggedIn"
-        private const val CONNECTED_SERVER = "connectedServer"
+        private const val LAST_MIRROR = "lastMirror"
+        private const val CONNECTED_MIRRORS = "connectedMirrors"
+        const val SERVICE_NAME = "FLoveIt"
     }
 
+    private val json = Json { encodeDefaults = true }
     private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-//    private val _connectedServer = MutableStateFlow<List<String>>(loadDevices())
-//    val connectedServer: StateFlow<List<String>> get() = _connectedServer.asStateFlow()
-//    private val json = Json { encodeDefaults = true }
+    private val _connectedMirrors = MutableStateFlow<List<MirrorDevice>>(emptyList())
+    val connectedMirrors: StateFlow<List<MirrorDevice>> get() = _connectedMirrors.asStateFlow()
 
+    // I want to store the last connected server also in the data store like login
+    private val _lastConnectedMirror = MutableStateFlow<MirrorDevice?>(null)
+    val lastConnectedMirror: StateFlow<MirrorDevice?> get() = _lastConnectedMirror.asStateFlow()
+
+    val findingMirror: StateFlow<Boolean> = hidClient.findingMirror
     val isConnected: StateFlow<Boolean> = hidClient.isConnected
     val serverMessage: StateFlow<String> = hidClient.serverMessage
     val deviceName: StateFlow<String> = hidClient.deviceName
@@ -29,6 +37,12 @@ class LightRepository(
     // Login Info
     private val _login = MutableStateFlow(settings.getBoolean(AUTH, false))
     val login: StateFlow<Boolean> = _login.asStateFlow()
+
+    private val _isLoginSuccess = MutableStateFlow(false)
+    val isLoginSuccess: StateFlow<Boolean> get() = _isLoginSuccess.asStateFlow()
+
+    private val _isLogin = MutableStateFlow(false)
+    val isLogin: StateFlow<Boolean> get() = _isLogin.asStateFlow()
 
 
     // Led State
@@ -53,34 +67,138 @@ class LightRepository(
     private val _favouriteMode = MutableStateFlow(false)
     val favouriteMode: StateFlow<Boolean> = _favouriteMode.asStateFlow()
 
-    suspend fun discovery() {
-        withContext(Dispatchers.IO) {
-            hidClient.discover()
+
+    init {
+        // …then load once everything (including `json`) is initialized
+        _connectedMirrors.value = loadMirrorDevice()
+
+        _lastConnectedMirror.value = loadLastMirror()
+    }
+
+
+    /** Reads the last mirror from Settings, or null if none was saved. */
+    private fun loadLastMirror(): MirrorDevice? {
+        val raw = settings.getString(LAST_MIRROR, "")
+        return try {
+            if (raw.isNotBlank()) json.decodeFromString<MirrorDevice>(raw) else null
+        } catch (e: Exception) {
+            println(e.message)
+            null
         }
     }
 
-//    private fun loadDevices(): List<String> =
-//        settings.getString(CONNECTED_SERVER, "[]")
-//            .let { json.decodeFromString(it) }
-//
-//    suspend fun addServerDevice(device: String) {
-//        withContext(Dispatchers.IO) {
-//            val updateDeviceName = (_connectedServer.value + device)
-//        }
-//    }
+
+    suspend fun startDiscoveryMirror(serverName: String , serverID: String) {
+        withContext(Dispatchers.IO) {
+            hidClient.discover("$serverName-$serverID")
+            println("Start discovery")
+        }
+    }
+
+    suspend fun disconnectMirror(){
+        withContext(Dispatchers.IO) {
+            hidClient.disconnect()
+            println("Disconnect mirror")
+        }
+    }
+
+    suspend fun disconnectMirror(mirror: MirrorDevice) {
+        withContext(Dispatchers.IO) {
+            // Reconstruct exactly the NsdService name you used when discovering:
+            val serviceName = "${SERVICE_NAME}-${mirror.id}"
+            // Ask the client if it knows a “key” for that name:
+            hidClient.lookupKeyForServiceName(serviceName)
+                ?.let { key -> hidClient.disconnectMirror(key) }
+        }
+    }
+
+    suspend fun addMirrorDevice(mirrorDevice: MirrorDevice) = withContext(Dispatchers.IO) {
+        val updated = (_connectedMirrors.value + mirrorDevice)
+            .distinctBy { it.id }    // avoid dupes
+        _connectedMirrors.value = updated
+        saveMirrorList(updated)
+    }
+
+    suspend fun removeMirrorDevice(mirror: MirrorDevice) {
+        withContext(Dispatchers.IO) {
+            // 1) If this mirror is currently connected, disconnect it:
+            disconnectMirror(mirror)
+
+            // 2) Remove from our in-memory + on-disk list:
+            val updated = _connectedMirrors.value.filterNot { it.id == mirror.id }
+            _connectedMirrors.value = updated
+            saveMirrorList(updated)
+
+            // 3) If this was the “lastConnected,” clear that:
+            _lastConnectedMirror.value?.let { last ->
+                if (last.id == mirror.id) {
+                    _lastConnectedMirror.value = null
+                    settings.putString(LAST_MIRROR, "")
+                }
+            }
+        }
+    }
+
+
+    /** Kick off discovery for the last mirror, if any. */
+    suspend fun startLastMirrorDiscovery() = withContext(Dispatchers.IO) {
+        _lastConnectedMirror.value?.let { startDiscoveryMirror(SERVICE_NAME, it.id) }
+        println("Start last mirror discovery")
+    }
+
+
+    fun updateLastMirror(device: MirrorDevice) {
+        _lastConnectedMirror.value = device
+        settings.putString(LAST_MIRROR, json.encodeToString(device))
+        println("Update last mirror $device")
+    }
+
+    private fun loadMirrorDevice(): List<MirrorDevice> =
+        settings.getString(CONNECTED_MIRRORS, "[]")
+            .let { json.decodeFromString<List<MirrorDevice>>(it) }
+
+
+    private fun saveMirrorList(list: List<MirrorDevice>) {
+        settings.putString(CONNECTED_MIRRORS,
+            json.encodeToString<List<MirrorDevice>>(list)
+        )
+    }
+
+
+
+
 
     // Handle Scan Data
     suspend fun handleScanData(data: String) {
         withContext(Dispatchers.IO) {
             println("🔍 Scanned data: $data")
-//            if (data.startsWith("FloveIt")) {
-//                _login.value = true
-//                settings.putBoolean(key = AUTH, value = true)
-//                println("✅ Login successful")
-//            }
-        }
+            if(data.startsWith("FLoveIt")){
+                val getData = data.removePrefix("FLoveIt")
+                val id = getData.substringAfter("id:").substringBefore(",")
+                val name = getData.substringAfter("name:")
+                val newMirrorDevice = MirrorDevice(id = id, name = name)
+                addMirrorDevice(newMirrorDevice)
+                updateLastMirror(newMirrorDevice)
+                println("Device name: $name")
 
+                while (!isConnected.value){
+                    _isLogin.value = true
+                    startDiscoveryMirror(serverName = SERVICE_NAME , serverID = id)
+                    delay(5000L)
+                    println("Searching...")
+                }
+
+                // If connected
+                _isLogin.value = false
+                if(sendAuthenticate("authenticated")){
+                    println("Successfully login")
+
+                }
+
+            }
+        }
     }
+
     // observe Server Message
     fun observeServerMessages(): Flow<String> =
         hidClient.serverMessage
@@ -90,7 +208,7 @@ class LightRepository(
                 if (message.startsWith("Server")) {
                     handleInitialData(message)
                 } else {
-                    handleServerMessage(message)
+                    handleServerAuthData(message)
                 }
             }
     // handle initial data
@@ -134,30 +252,36 @@ class LightRepository(
 
     }
     // handle server message
-    private fun handleServerMessage(message : String) {
+    private fun handleServerAuthData(message : String) {
         when (message) {
-            "unauthenticated${deviceName.value},${deviceID.value}" -> {
+            "unauthenticated${deviceName.value}-${deviceID.value}" -> {
                 _login.value = false
+                updateAuthStatus(false)
                 settings.putBoolean(key = AUTH , value = false)
                 println("❌ Login failed")
             }
-            "authenticated${deviceName.value},${deviceID.value}" -> {
+            "authenticated${deviceName.value}-${deviceID.value}" -> {
                 _login.value = true
+                updateAuthStatus(true)
                 settings.putBoolean(key = AUTH , value = true)
                 println("✅ Login successful")
             }
         }
     }
+
+    fun updateAuthStatus(auth: Boolean) {
+        _isLoginSuccess.value = auth
+    }
     // send data
     suspend fun sendData(data: String): Boolean {
-        val sendData = "${deviceName.value},${deviceID.value}FloveIt$data"
+        val sendData = "${deviceName.value}-${deviceID.value},$data"
         return withContext(Dispatchers.IO) {
             hidClient.send(sendData)   // ✅ return the Boolean result
         }
     }
     // send Authentication
     suspend fun sendAuthenticate(data: String) : Boolean{
-        val sendData = "$data${deviceName.value},${deviceID.value}"
+        val sendData = "$data${deviceName.value}-${deviceID.value}"
         println(sendData)
        return withContext(Dispatchers.IO) {
             hidClient.send(sendData)
@@ -262,11 +386,13 @@ class LightRepository(
     // Logout from device control
     suspend fun logout(){
         withContext(Dispatchers.IO) {
-            if(sendAuthenticate("unauthenticated")){
-                _login.value = false
-                settings.putBoolean(key = AUTH , value = false)
-                println("✅ Logout successful")
-            }
+//            if(sendAuthenticate("unauthenticated")){
+//                _login.value = false
+//                settings.putBoolean(key = AUTH , value = false)
+//                println("✅ Logout successful")
+//            }
+            _login.value = false
+            settings.putBoolean(key = AUTH , value = false)
         }
 
     }

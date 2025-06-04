@@ -9,12 +9,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.floveit.floveitcontrol.lightControl.helperfunctions.*
 import com.floveit.floveitcontrol.platformSpecific.isAndroid
-import com.floveit.floveitcontrol.viewmodel.FloveItControlViewModel
+import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
 import floveitcontrol.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun LightScreen(viewModel: FloveItControlViewModel){
+fun LightScreen(modifier: Modifier = Modifier, viewModel: FLoveItControlViewModel){
 
     val brightness by viewModel.ledBrightness.collectAsState()
     val colorTemp by viewModel.ledColorTemp.collectAsState()
@@ -24,21 +24,23 @@ fun LightScreen(viewModel: FloveItControlViewModel){
     val nightMode by viewModel.nightMode.collectAsState()
     val favouriteMode by viewModel.favouriteMode.collectAsState()
     val login by viewModel.login.collectAsState()
+    val isConnected by viewModel.isConnected.collectAsState()
     var sendBrightness by remember { mutableStateOf(false) }
     var sendColorTemp by remember { mutableStateOf(false) }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp)) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize().padding(horizontal = 10.dp)) {
         val maxHeight = maxHeight
         val maxWidth = maxWidth
         // ✅ Main control panel center
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Custom Switch
-            Box(modifier = Modifier.widthIn(max = 380.dp)
+            Box(modifier = modifier.widthIn(max = 380.dp)
                 .heightIn(min = 130.dp , max = 150.dp)) {
                 SwitchButton(
+                    connection = isConnected,
                     checked = ledState,
                     onCheckedChange = {
                         val newState = !ledState
@@ -51,10 +53,10 @@ fun LightScreen(viewModel: FloveItControlViewModel){
                 )
             }
 
-            Spacer(Modifier.height(if(isAndroid()) 30.dp else (maxHeight * 0.04f)))
+            Spacer(modifier.height(if(isAndroid()) 30.dp else (maxHeight * 0.04f)))
             // Sliders
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -63,7 +65,7 @@ fun LightScreen(viewModel: FloveItControlViewModel){
                         contentScale = ContentScale.FillBounds,
                         //modifier = Modifier.size(45.dp)
                     )
-                    Spacer(Modifier.height(25.dp))
+                    Spacer(modifier.height(25.dp))
                     FloveItSlider(
 
                         value = brightness,
@@ -91,14 +93,14 @@ fun LightScreen(viewModel: FloveItControlViewModel){
                     )
 
                 }
-                Spacer(Modifier.width(if(isAndroid()) 60.dp else (maxWidth * 0.18f)))
+                Spacer(modifier.width(if(isAndroid()) 60.dp else (maxWidth * 0.18f)))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(Res.drawable.colortemp),
                         contentDescription = "Color Temp",
                         contentScale = ContentScale.FillBounds,
                         //modifier = Modifier.size(48.dp)
                     )
-                    Spacer(Modifier.height(25.dp))
+                    Spacer(modifier.height(25.dp))
                     FloveItSlider(
                         value = colorTemp ,
                         onValueChange = { newColorTemp ->
@@ -136,20 +138,20 @@ fun LightScreen(viewModel: FloveItControlViewModel){
 
             }
 
-            Spacer(Modifier.height(if(isAndroid()) 40.dp else (maxHeight * 0.05f)))
+            Spacer(modifier.height(if(isAndroid()) 40.dp else (maxHeight * 0.05f)))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(Modifier.weight(1f).fillMaxHeight()){
+                Box(modifier.weight(1f).fillMaxHeight()){
                     ModeIcon(isModeOn = boostMode, painterOnRes = Res.drawable.boost_on, painterOffRes = Res.drawable.boost_off,
                         onClick = { viewModel.toggleBoostMode() }
                     )
                 }
 
 
-                Box(Modifier.weight(1f).fillMaxHeight()){
+                Box(modifier.weight(1f).fillMaxHeight()){
                     ModeIcon(isModeOn = makeupMode, painterOnRes = Res.drawable.makeup_on, painterOffRes = Res.drawable.makeup_off,
                         onClick = { viewModel.toggleMakeupMode() }
                     )
@@ -157,14 +159,14 @@ fun LightScreen(viewModel: FloveItControlViewModel){
 
 
 
-                Box(Modifier.weight(1f).fillMaxHeight()){
+                Box(modifier.weight(1f).fillMaxHeight()){
                     ModeIcon(isModeOn = nightMode, painterOnRes = Res.drawable.night_on, painterOffRes = Res.drawable.night_off,
                         onClick = { viewModel.toggleNightMode() }
                     )
                 }
 
 
-                Box(Modifier.weight(1f)){
+                Box(modifier.weight(1f)){
                     ModeIcon(isModeOn = favouriteMode, painterOnRes = Res.drawable.favourite_on, painterOffRes = Res.drawable.favourite_off,
                         onClick = { viewModel.toggleFavouriteMode() }
                     )

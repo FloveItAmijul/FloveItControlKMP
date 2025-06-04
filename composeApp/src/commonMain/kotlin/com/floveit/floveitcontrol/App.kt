@@ -6,9 +6,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.floveit.floveitcontrol.lightControl.LightRepository
 import com.floveit.floveitcontrol.meterialui.BackgroundColor
-import com.floveit.floveitcontrol.navigations.FLoveItNavigation
+import com.floveit.floveitcontrol.navigations.screens.FLoveItNavController
 import com.floveit.floveitcontrol.platformSpecific.SetTransparentSystemBars
-import com.floveit.floveitcontrol.viewmodel.FloveItControlViewModel
+import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -17,18 +17,15 @@ fun App(
     client: HidClient = provideHidClient()
 ) {
     val lightRepository = remember { LightRepository(client) }
-    val viewModel = remember { FloveItControlViewModel(lightRepository) }
+    val viewModel = remember { FLoveItControlViewModel(lightRepository) }
     SetTransparentSystemBars()
     MaterialTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
-            LaunchedEffect(Unit) {
-                viewModel.discover()
-            }
             BackgroundColor {
-                FLoveItNavigation(
-                    modifier = Modifier.padding(paddingValues).statusBarsPadding(),//.navigationBarsPadding(),
+                FLoveItNavController(
+                    modifier = Modifier.padding(paddingValues).statusBarsPadding(), // navigation bar padding
                     viewModel = viewModel
                 )
             }

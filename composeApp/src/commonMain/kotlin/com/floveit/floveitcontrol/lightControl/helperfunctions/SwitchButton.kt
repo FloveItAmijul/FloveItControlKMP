@@ -16,6 +16,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun SwitchButton(
     checked: Boolean,
+    connection: Boolean = false,
     onCheckedChange: (Boolean) -> Unit,
     thumbColor: Color = Color.White,
     trackColorChecked: Color = Color.Green,
@@ -43,9 +44,9 @@ fun SwitchButton(
         ){
 
 
-            Column {
+            Column (verticalArrangement = Arrangement.Center) {
                 Image(
-                    painter = painterResource(if(checked) Res.drawable.light else Res.drawable.light_off),
+                    painter = painterResource(if(connection) Res.drawable.light else Res.drawable.light_off),
                     contentDescription = "Light Icon",
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.size(48.dp)
