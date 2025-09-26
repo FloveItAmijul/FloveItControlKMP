@@ -1,6 +1,8 @@
 package com.floveit.floveitcontrol.lightControl
 
 import com.floveit.floveitcontrol.HidClient
+import com.floveit.floveitcontrol.filetransfer.FileSender
+import com.floveit.floveitcontrol.filetransfer.PickedFile
 import com.floveit.floveitcontrol.settings.mirrors.MirrorDevice
 import com.floveit.floveitcontrol.platformSpecific.provideSettings
 import com.russhwolf.settings.Settings
@@ -19,8 +21,13 @@ class LightRepository(
         const val SERVICE_NAME = "FLoveIt"
     }
 
+    private val _currentScreen = MutableStateFlow(1)
+    val currentScreen: StateFlow<Int> get() = _currentScreen.asStateFlow()
+
+
+
     private val json = Json { encodeDefaults = true }
-    private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    // private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val _connectedMirrors = MutableStateFlow<List<MirrorDevice>>(emptyList())
     val connectedMirrors: StateFlow<List<MirrorDevice>> get() = _connectedMirrors.asStateFlow()
 
@@ -28,9 +35,7 @@ class LightRepository(
     private val _lastConnectedMirror = MutableStateFlow<MirrorDevice?>(null)
     val lastConnectedMirror: StateFlow<MirrorDevice?> get() = _lastConnectedMirror.asStateFlow()
 
-    val findingMirror: StateFlow<Boolean> = hidClient.findingMirror
     val isConnected: StateFlow<Boolean> = hidClient.isConnected
-    val serverMessage: StateFlow<String> = hidClient.serverMessage
     val deviceName: StateFlow<String> = hidClient.deviceName
     val deviceID: StateFlow<String> = hidClient.deviceID
 
@@ -41,8 +46,10 @@ class LightRepository(
     private val _isLoginSuccess = MutableStateFlow(false)
     val isLoginSuccess: StateFlow<Boolean> get() = _isLoginSuccess.asStateFlow()
 
-    private val _isLogin = MutableStateFlow(false)
-    val isLogin: StateFlow<Boolean> get() = _isLogin.asStateFlow()
+    private val _startConnecting = MutableStateFlow(false)
+    val startConnecting: StateFlow<Boolean> get() = _startConnecting.asStateFlow()
+
+
 
 
     // Led State
@@ -69,12 +76,16 @@ class LightRepository(
 
 
     init {
-        // …then load once everything (including `json`) is initialized
+
         _connectedMirrors.value = loadMirrorDevice()
 
         _lastConnectedMirror.value = loadLastMirror()
     }
 
+
+    fun currentScreen(currentScreen: Int){
+        _currentScreen.value = currentScreen
+    }
 
     /** Reads the last mirror from Settings, or null if none was saved. */
     private fun loadLastMirror(): MirrorDevice? {
@@ -173,6 +184,7 @@ class LightRepository(
         withContext(Dispatchers.IO) {
             println("🔍 Scanned data: $data")
             if(data.startsWith("FLoveIt")){
+                _startConnecting.value = true
                 val getData = data.removePrefix("FLoveIt")
                 val id = getData.substringAfter("id:").substringBefore(",")
                 val name = getData.substringAfter("name:")
@@ -182,17 +194,14 @@ class LightRepository(
                 println("Device name: $name")
 
                 while (!isConnected.value){
-                    _isLogin.value = true
                     startDiscoveryMirror(serverName = SERVICE_NAME , serverID = id)
                     delay(5000L)
                     println("Searching...")
                 }
 
                 // If connected
-                _isLogin.value = false
                 if(sendAuthenticate("authenticated")){
                     println("Successfully login")
-
                 }
 
             }
@@ -229,27 +238,6 @@ class LightRepository(
         //parsedData["LoggedIn"]?.split(",")?.let { _user.value = it }
         parsedData["LedState"]?.toBoolean()?.let { _ledState.value = it }
 
-//        // Check if the Android ID is in the user list
-//        val isAuthenticated = _user.value.any { user ->
-//            println("All User: $user")
-//            if (user == _deviceName.value) {
-//                updateAuth(true)
-//                println("user: $user && ID: ${_deviceName.value}")
-//                true // Stop iteration once a match is found
-//            } else {
-//                false
-//            }
-//        }
-//
-//        // Handle database update based on authentication status
-//        if (!isAuthenticated) {
-//            try {
-//                updateAuth(false)
-//            } catch (e: IOException) {
-//                Log.e("Database", "IOException: ${e.message}")
-//            }
-//        }
-
     }
     // handle server message
     private fun handleServerAuthData(message : String) {
@@ -263,10 +251,15 @@ class LightRepository(
             "authenticated${deviceName.value}-${deviceID.value}" -> {
                 _login.value = true
                 updateAuthStatus(true)
+                _startConnecting.value = false
                 settings.putBoolean(key = AUTH , value = true)
                 println("✅ Login successful")
             }
         }
+    }
+
+    fun updateConnectedStatus(isConnecting: Boolean){
+        _startConnecting.value = isConnecting
     }
 
     fun updateAuthStatus(auth: Boolean) {
@@ -283,7 +276,7 @@ class LightRepository(
     suspend fun sendAuthenticate(data: String) : Boolean{
         val sendData = "$data${deviceName.value}-${deviceID.value}"
         println(sendData)
-       return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO) {
             hidClient.send(sendData)
         }
     }
@@ -313,7 +306,7 @@ class LightRepository(
             }
         }
     }
-// update ledColorTemp and store in database
+    // update ledColorTemp and store in database
     suspend fun updateLedColorTemp(ledColorTemp: Float) {
         withContext(Dispatchers.IO) {
             val sendLedColorTemp = sendData("WarmCool$ledColorTemp")
@@ -328,7 +321,7 @@ class LightRepository(
     }
     // update Mode and store in database
     suspend fun toggleBoostMode() {
-       withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             val command = if (_boostMode.value) "BoostOFF" else "BoostON"
             if (sendData(command)) {
                 _boostMode.value = !_boostMode.value
@@ -383,6 +376,23 @@ class LightRepository(
             }
         }
     }
+
+    // Add this helper to build the endpoint from your HidClient:
+    private fun currentMirrorEndpoint(): Pair<String, Int> {
+        // Expose these from HidClient via StateFlow or keep them where you already store them.
+        val host = hidClient.currentHost.value ?: error("Mirror host not available")
+        val port = 40035 // you fixed this in your server
+        return host to port
+    }
+
+    // Call this from Android after you have the bytes:
+    suspend fun sendPickedFile(
+        file: PickedFile
+    ) {
+        val (host, port) = currentMirrorEndpoint()
+        FileSender.sendFile(host, port, file.bytes, file.displayName, file.mime)
+    }
+
     // Logout from device control
     suspend fun logout(){
         withContext(Dispatchers.IO) {

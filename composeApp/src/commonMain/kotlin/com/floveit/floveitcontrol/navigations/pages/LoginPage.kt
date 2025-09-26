@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,12 +29,16 @@ fun LoginPage(modifier: Modifier, viewModel: FLoveItControlViewModel){
 
     val navigator = LocalNavigator.currentOrThrow
 
+    val isConnected by viewModel.isConnected.collectAsState()
     val isLoginSuccess by viewModel.isLoginSuccess.collectAsState()
     val login by viewModel.login.collectAsState()
+    val startConnecting by viewModel.startConnecting.collectAsState()
+
     var hasScanned by remember { mutableStateOf(false) }
     var showTutorial by remember { mutableStateOf(true) }
     var tutorialPage by remember { mutableStateOf(0) }
     var showScan by remember { mutableStateOf(false) }
+
 
     val pages  = listOf(
         TutorialPage(Res.drawable.tuto1 , "Open this app on your smart mirror"),
@@ -43,7 +48,7 @@ fun LoginPage(modifier: Modifier, viewModel: FLoveItControlViewModel){
 
     LaunchedEffect(isLoginSuccess) {
         if(isLoginSuccess){
-            navigator.push(MainDashboardScreen(modifier = modifier ,viewModel = viewModel))
+            navigator.push(MainDashboardScreen)
         }
     }
 
@@ -100,7 +105,7 @@ fun LoginPage(modifier: Modifier, viewModel: FLoveItControlViewModel){
                     contentDescription = "Close",
                     tint = Color.White,
                     modifier = Modifier.clickable {
-                        navigator.push(MainDashboardScreen(modifier = modifier ,viewModel = viewModel))
+                        navigator.push(MainDashboardScreen)
                     }
                 )
 
@@ -168,6 +173,7 @@ fun LoginPage(modifier: Modifier, viewModel: FLoveItControlViewModel){
                                     }
                             )
                         } else {
+
                             CameraView(onQRCodeScanned = { result ->
                                 if(!hasScanned && result.startsWith("FLoveIt")){
                                     hasScanned = true
@@ -175,6 +181,16 @@ fun LoginPage(modifier: Modifier, viewModel: FLoveItControlViewModel){
                                 }
                             })
 
+                        }
+
+                        if(startConnecting){
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center),
+                                color = Color.White,
+                                strokeWidth = 6.dp,
+                                backgroundColor = Color.Green,
+                                strokeCap = StrokeCap.Round
+                            )
                         }
                     }
                 }

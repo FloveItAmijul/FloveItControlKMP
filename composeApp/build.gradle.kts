@@ -8,8 +8,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
-
     id("org.jetbrains.kotlin.native.cocoapods")
+    id("app.cash.sqldelight") version "2.1.0"
 }
 
 kotlin {
@@ -48,15 +48,19 @@ kotlin {
 
 
     sourceSets {
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.camera.camera2)
             implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
-            implementation("androidx.compose.material:material-icons-extended:1.7.8")
-            implementation ("com.google.mlkit:barcode-scanning:17.3.0")
+            implementation(libs.androidx.material.icons.extended)
+            implementation (libs.barcode.scanning)
+
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.network)
+
 
         }
         commonMain.dependencies {
@@ -71,7 +75,23 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.multiplatform.settings)
             implementation(libs.kotlinx.serialization.json)
-            implementation("cafe.adriel.voyager:voyager-navigator:1.1.0-beta03")
+            implementation(libs.voyager.navigator)
+
+            implementation(libs.kotlinx.datetime) // or latest
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.encoding)
+            implementation(libs.ktor.network)
+
+
+
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
 
     }

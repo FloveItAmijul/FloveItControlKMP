@@ -23,7 +23,7 @@ import org.jetbrains.compose.resources.painterResource
 fun FLoveItMainPage(modifier: Modifier = Modifier  , viewModel: FLoveItControlViewModel){
 
 
-    var currentScreen by remember { mutableStateOf(1) }
+    val currentScreen by viewModel.currentScreen.collectAsState()
     val isConnected by viewModel.isConnected.collectAsState()
 
 
@@ -70,9 +70,9 @@ fun FLoveItMainPage(modifier: Modifier = Modifier  , viewModel: FLoveItControlVi
                 CustomBottomBar(
                     //  modifier.align(Alignment.Center),
                     selectedScreen = currentScreen,
-                    onSettingsClick = { currentScreen = 0 },
-                    onLightClick = { currentScreen = 1 },
-                    onMouseClick = { currentScreen = 2 }
+                    onSettingsClick = { viewModel.tabNavigation(0)  },
+                    onLightClick = {  viewModel.tabNavigation(1) },
+                    onMouseClick = {  viewModel.tabNavigation(2) }
                 )
             }
 

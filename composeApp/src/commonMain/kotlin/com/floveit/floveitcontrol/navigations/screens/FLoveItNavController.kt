@@ -6,17 +6,15 @@ import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
+import com.floveit.floveitcontrol.di.LocalFLoveItViewModel
 
 @Composable
-fun FLoveItNavController(modifier: Modifier , viewModel: FLoveItControlViewModel) {
+fun FLoveItNavController(modifier: Modifier ) {
+
+    val viewModel = LocalFLoveItViewModel.current
 
     val login by viewModel.login.collectAsState()
 
-    val startScreen = if(login){
-        MainDashboardScreen(modifier = modifier ,viewModel = viewModel)
-    }else{
-        LoginScreen(modifier = modifier ,viewModel = viewModel)
-    }
-
+    val startScreen = if (login) MainDashboardScreen else LoginScreen
     Navigator(startScreen)
 }

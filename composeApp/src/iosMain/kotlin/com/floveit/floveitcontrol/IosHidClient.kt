@@ -31,6 +31,13 @@ class IosHidClient : HidClient {
     private val _findingMirror = MutableStateFlow(false)
     override val findingMirror: StateFlow<Boolean> = _findingMirror
 
+    // ⬇️ New endpoint flows
+    private val _currentHost = MutableStateFlow<String?>(null)
+    override val currentHost: StateFlow<String?> = _currentHost
+
+    private val _currentPort = MutableStateFlow(40035) // fixed, or set dynamically
+    override val currentPort: StateFlow<Int> = _currentPort
+
     //–– retry scope
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
@@ -66,6 +73,8 @@ class IosHidClient : HidClient {
                     didFindService.delegate = object : NSObject(), NSNetServiceDelegateProtocol {
                         override fun netServiceDidResolveAddress(sender: NSNetService) {
                             sender.hostName?.let { host ->
+                                _currentHost.value = host
+                                _currentPort.value = sender.port.toInt()
                                 scope.launch { connect(host, sender.port.toInt(), name) }
                             }
                         }
@@ -166,7 +175,7 @@ class IosHidClient : HidClient {
         }
     }
 
-//    override suspend fun send(data: String): Boolean = withContext(Dispatchers.Default) {
+    //    override suspend fun send(data: String): Boolean = withContext(Dispatchers.Default) {
 //        if (outputStreams.isEmpty()) return@withContext false
 //        val payload = (data + "\n").encodeToByteArray()
 //        payload.usePinned { pinned ->
@@ -181,30 +190,30 @@ class IosHidClient : HidClient {
 //        }
 //        true
 //    }
-override suspend fun send(data: String): Boolean = withContext(Dispatchers.Default) {
-    // If there are no open output streams, bail out immediately
-    if (outputStreams.isEmpty()) return@withContext false
+    override suspend fun send(data: String): Boolean = withContext(Dispatchers.Default) {
+        // If there are no open output streams, bail out immediately
+        if (outputStreams.isEmpty()) return@withContext false
 
-    val payload = (data + "\n").encodeToByteArray()
-    payload.usePinned { pinned ->
-        val ptr = pinned.addressOf(0).reinterpret<UByteVar>()
-        // Iterate a copy of the keys so we can remove while iterating
-        val iterator = outputStreams.entries.iterator()
-        while (iterator.hasNext()) {
-            val (name, out) = iterator.next()
-            try {
-                out.write(ptr, payload.size.convert())
-            } catch (_: Throwable) {
-                // Tear down this service if write fails
-                disconnectService(name)
-                iterator.remove()
+        val payload = (data + "\n").encodeToByteArray()
+        payload.usePinned { pinned ->
+            val ptr = pinned.addressOf(0).reinterpret<UByteVar>()
+            // Iterate a copy of the keys so we can remove while iterating
+            val iterator = outputStreams.entries.iterator()
+            while (iterator.hasNext()) {
+                val (name, out) = iterator.next()
+                try {
+                    out.write(ptr, payload.size.convert())
+                } catch (_: Throwable) {
+                    // Tear down this service if write fails
+                    disconnectService(name)
+                    iterator.remove()
+                }
             }
         }
-    }
 
-    // Return true if at least one stream remains (i.e. we “sent” to something)
-    return@withContext outputStreams.isNotEmpty()
-}
+        // Return true if at least one stream remains (i.e. we “sent” to something)
+        return@withContext outputStreams.isNotEmpty()
+    }
 
 
     override fun disconnect() {

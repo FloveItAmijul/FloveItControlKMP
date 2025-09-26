@@ -18,7 +18,6 @@ import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import android.os.Handler
 import android.os.Looper
-import com.floveit.floveitcontrol.settings.mirrors.MirrorDevice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,7 +26,6 @@ class AndroidHidClient(private val context: Context) : HidClient {
     companion object {
         private const val TAG = "HidClient"
         private const val SERVICE_TYPE = "_hidserver._tcp."
-        private const val SERVICE_NAME = "FLoveIt"
     }
 
     // hold all available server
@@ -40,7 +38,7 @@ class AndroidHidClient(private val context: Context) : HidClient {
     // At the top of AndroidHidClient:
     private val serviceNameToKey = mutableMapOf<String, String>()
 
-   // private var readJob: Job? = null
+    // private var readJob: Job? = null
     private val readJobs = ConcurrentHashMap<String , Job>()
     private val connections = ConcurrentHashMap<String , Socket>()
     private val nsd = context.getSystemService(Context.NSD_SERVICE) as NsdManager
@@ -58,6 +56,14 @@ class AndroidHidClient(private val context: Context) : HidClient {
     override val isConnected: StateFlow<Boolean> get() = _isConnected.asStateFlow()
     private val _serverMessage = MutableStateFlow("")
     override val serverMessage: StateFlow<String> get() = _serverMessage.asStateFlow()
+
+    // ⬇️ New endpoint flows
+    private val _currentHost = MutableStateFlow<String?>(null)
+    override val currentHost: StateFlow<String?> = _currentHost
+
+    private val _currentPort = MutableStateFlow(40035) // fixed, or set dynamically
+    override val currentPort: StateFlow<Int> = _currentPort
+
 
     init { getDeviceInfo() }
 
@@ -125,7 +131,11 @@ class AndroidHidClient(private val context: Context) : HidClient {
                     }
                     override fun onServiceResolved(si: NsdServiceInfo) {
                         val host = si.host?.hostAddress ?: return
+                        val port = si.port
                         val key = "$host:${si.port}"
+                        _currentHost.value = host
+                        _currentPort.value = port   // or keep 40035 if you prefer fixed
+                        // … proceed to connect your control socket if that’s what your client does
                         if (connections.containsKey(key)) {
                             Log.d(TAG, "$key already connected, skipping")
                             return
@@ -152,12 +162,12 @@ class AndroidHidClient(private val context: Context) : HidClient {
 
     private fun connect(si: NsdServiceInfo , key: String) {
         // tear down previous socket/read‐job
-       // readJob?.cancel()
-       // socket?.close()
+        // readJob?.cancel()
+        // socket?.close()
 
         try {
-          //  socket = Socket(si.host, si.port).apply { keepAlive = true }
-         //  _isConnected.value = true
+            //  socket = Socket(si.host, si.port).apply { keepAlive = true }
+            //  _isConnected.value = true
 
 
             val sock = Socket(si.host , si.port).apply { keepAlive = true }

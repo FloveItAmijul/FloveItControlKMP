@@ -1,20 +1,26 @@
 package com.floveit.floveitcontrol.viewmodel
 
 import androidx.lifecycle.*
+import com.floveit.floveitcontrol.filetransfer.PickedFile
+import com.floveit.floveitcontrol.settings.SettingsRepository
 import com.floveit.floveitcontrol.settings.mirrors.MirrorDevice
 import com.floveit.floveitcontrol.lightControl.LightRepository
+import com.floveit.floveitcontrol.platformSpecific.getAppInfo
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.launch
 
-class FLoveItControlViewModel(private val lightRepository: LightRepository) : ViewModel(){
+class FLoveItControlViewModel(
+    private val lightRepository: LightRepository,
+    private val settingsRepository: SettingsRepository
+) : ViewModel(){
 
-    val findingMirror : StateFlow<Boolean> = lightRepository.findingMirror
     val isConnected : StateFlow<Boolean> = lightRepository.isConnected
     val login : StateFlow<Boolean> = lightRepository.login
-    val isLogin : StateFlow<Boolean> = lightRepository.isLogin
     val ledState : StateFlow<Boolean> = lightRepository.ledState
     val ledBrightness : StateFlow<Float> = lightRepository.ledBrightness
     val ledColorTemp : StateFlow<Float> = lightRepository.ledColorTemp
@@ -24,6 +30,23 @@ class FLoveItControlViewModel(private val lightRepository: LightRepository) : Vi
     val favouriteMode : StateFlow<Boolean> = lightRepository.favouriteMode
     val connectedMirrors: StateFlow<List<MirrorDevice>> = lightRepository.connectedMirrors
     val isLoginSuccess: StateFlow<Boolean> = lightRepository.isLoginSuccess
+    val lastConnectedMirror: StateFlow<MirrorDevice?> = lightRepository.lastConnectedMirror
+    val startConnecting: StateFlow<Boolean> = lightRepository.startConnecting
+    val currentScreen: StateFlow<Int> = lightRepository.currentScreen
+    // Timer and Mouse Settings
+    val timer: StateFlow<String> = settingsRepository.timer
+    val timerValue: StateFlow<Long> = settingsRepository.timerValue
+    private val _trackpadSensitivity = MutableStateFlow(settingsRepository.getTrackpadSensitivity())
+    val trackpadSensitivity: StateFlow<Float> get() = _trackpadSensitivity.asStateFlow()
+    private val _scrollBar = MutableStateFlow(settingsRepository.getScrollbar())
+    val scrollBar: StateFlow<Boolean> get() = _scrollBar.asStateFlow()
+    private val _scrollSPosition = MutableStateFlow(settingsRepository.getScrollbarPosition())
+    val scrollPosition: StateFlow<String> get() = _scrollSPosition.asStateFlow()
+    private val _scrollSensitivity = MutableStateFlow(settingsRepository.getScrollSensitivity())
+    val scrollSensitivity: StateFlow<Float> get() = _scrollSensitivity.asStateFlow()
+    private val _scrollDirection = MutableStateFlow(settingsRepository.getScrollDirection())
+    val scrollDirection: StateFlow<Boolean> get() = _scrollDirection.asStateFlow()
+
 
 
 
@@ -46,9 +69,14 @@ class FLoveItControlViewModel(private val lightRepository: LightRepository) : Vi
                 }
                 .collect { message ->
                     // handle each server message here
-                    println("FloveItViewModel observeServerMessages: $message")
+                    println("FLoveItViewModel observeServerMessages: $message")
                 }
         }
+        settingsRepository.setTimer(0)
+    }
+
+    fun tabNavigation(currentScreen: Int) {
+        lightRepository.currentScreen(currentScreen)
     }
 
     fun startDiscoveryMirror(device: MirrorDevice) {
@@ -97,14 +125,14 @@ class FLoveItControlViewModel(private val lightRepository: LightRepository) : Vi
 
     fun sendData(data: String , onResult: (Boolean) -> Unit)  {
         viewModelScope.launch {
-           val send = lightRepository.sendData(data)
+            val send = lightRepository.sendData(data)
             onResult(send)
         }
     }
 
     fun sendAuthenticate(data: String, onResult: (Boolean) -> Unit){
         viewModelScope.launch {
-          val sendAuth =  lightRepository.sendAuthenticate(data)
+            val sendAuth =  lightRepository.sendAuthenticate(data)
             onResult(sendAuth)
         }
     }
@@ -156,6 +184,63 @@ class FLoveItControlViewModel(private val lightRepository: LightRepository) : Vi
     fun updateAuthStatus(auth: Boolean) {
         lightRepository.updateAuthStatus(auth)
     }
+
+    fun updateConnectedStatus(isConnecting: Boolean){
+        lightRepository.updateConnectedStatus(isConnecting)
+    }
+
+    // setTimer
+
+    // Next (wraps to first after last)
+    fun nextTimer(){
+        settingsRepository.nextTimer()
+        sendData("Time${timerValue.value}"){}
+    }
+    // Previous (wraps to last if at first)
+    fun previousTimer() {
+        settingsRepository.previousTimer()
+        sendData("Time${timerValue.value}"){}
+    }
+
+
+    fun setTrackpadSensitivity(value: Float) {
+        _trackpadSensitivity.value = value
+        settingsRepository.setTrackpadSensitivity(value)
+    }
+
+    fun setScrollbar(value: Boolean) {
+        _scrollBar.value = value
+        settingsRepository.setScrollbar(value)
+    }
+
+    fun setScrollbarPosition(value: String) {
+        _scrollSPosition.value = value
+        settingsRepository.setScrollbarPosition(value)
+    }
+
+    fun setScrollSensitivity(value: Float) {
+        _scrollSensitivity.value = value
+        settingsRepository.setScrollSensitivity(value)
+    }
+
+    fun setScrollDirection(value: Boolean) {
+        _scrollDirection.value = value
+        settingsRepository.setScrollDirection(value)
+    }
+
+    fun getAppVersion() : String {
+        return getAppInfo().getAppInfo()
+    }
+
+    fun sendPickedFile(file: PickedFile, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            runCatching {
+                lightRepository.sendPickedFile(file)
+            }.onSuccess { onResult(true)}
+                .onFailure { onResult(false)}
+        }
+    }
+
 
     fun logout(){
         viewModelScope.launch {

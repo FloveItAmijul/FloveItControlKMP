@@ -1,32 +1,23 @@
 package com.floveit.floveitcontrol.settings
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import cafe.adriel.voyager.navigator.*
-import com.floveit.floveitcontrol.navigations.screens.LoginScreen
-import com.floveit.floveitcontrol.navigations.screens.MirrorsScreen
+import com.floveit.floveitcontrol.navigations.screens.*
+import com.floveit.floveitcontrol.platformSpecific.isAndroid
+import com.floveit.floveitcontrol.settings.helper.CustomSwitch
+import com.floveit.floveitcontrol.settings.helper.TimerButton
 import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
-import floveitcontrol.composeapp.generated.resources.*
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun SettingScreen(
@@ -37,11 +28,37 @@ fun SettingScreen(
 
     val mirrorDevices by viewModel.connectedMirrors.collectAsState()
     val isConnected by viewModel.isConnected.collectAsState()
+    // settings
+    val timer by viewModel.timer.collectAsState()
+    val trackpadSensitivity by viewModel.trackpadSensitivity.collectAsState()
+    val scrollBar by viewModel.scrollBar.collectAsState()
+    val scrollbarPosition by viewModel.scrollPosition.collectAsState()
+    val scrollSensitivity by viewModel.scrollSensitivity.collectAsState()
+    val scrollDirection by viewModel.scrollDirection.collectAsState()
 
-    var expanded by remember { mutableStateOf(false) }
     var showNet by remember { mutableStateOf(false) }
+    var appVersion by remember { mutableStateOf("Version ") }
 
-    val settingSize = 90.dp
+
+    val settingHeight = if(isAndroid()) 60.dp else 70.dp
+    val settingBoxRound = 15
+    val settingRound = 25
+    val settingColor = Color.White.copy(0.1f)
+    val settingHPadding = 15.dp
+    val settingTextSize = 14.sp
+    val spacedBy = if(isAndroid()) 15.dp else 20.dp
+
+    val trackpadSensitivityList = remember { (1..20).map { it / 5f } }
+    val currentIndexOfTrackpad = trackpadSensitivityList.indexOfFirst {
+        kotlin.math.abs(it - trackpadSensitivity) < 0.05f
+    }.coerceAtLeast(0)
+
+    val scrollSensitivityList = remember { (1..20).map { it / 5f } }
+    val currentIndexOfScroll = scrollSensitivityList.indexOfFirst {
+        kotlin.math.abs(it - scrollSensitivity) < 0.05f
+    }.coerceAtLeast(0)
+
+
 
     // Whenever we reconnect, hide the progress indicator
     LaunchedEffect(isConnected) {
@@ -50,164 +67,290 @@ fun SettingScreen(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()
-        .padding(20.dp)
-        .clickable(
-            interactionSource = MutableInteractionSource(),
-            indication = null
-        ) {
-            expanded = false
-        }
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(horizontal = 15.dp)
+        .verticalScroll(rememberScrollState())
+        ,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(spacedBy)
     ) {
-        // --------------------------------------
-        // MAIN CONTENT: the “Settings” screen
-        // --------------------------------------
-
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 60.dp , start = 10.dp , end = 10.dp)
-                .clickable(
-                    interactionSource = MutableInteractionSource(),
-                    indication = null
-                ) {
-                    expanded = false
-                },
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+        // Connection Section
+        Box(
+            modifier = Modifier.fillMaxWidth()
+                .background( color = Color.Black.copy(.17f) , shape = RoundedCornerShape(settingBoxRound))
+            ,
+            contentAlignment = Alignment.Center
         ) {
 
+            Column(modifier = Modifier.fillMaxWidth().padding(20.dp)
+                ,
+                verticalArrangement = Arrangement.spacedBy(spacedBy)
+            ) {
 
-            // 1) add new mirror device
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(settingSize), // set a fixed height matching your image’s aspect ratio
-                contentAlignment = Alignment.Center
-            ){
-                Image(
-                    painter = painterResource(Res.drawable.add_mirror),
-                    contentDescription = "add mirros",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier.clickable {
+
+
+
+                // Header Of Connection
+                Text("Connection" , color = Color.White)
+                Row(modifier = Modifier.fillMaxWidth()
+                    .height(settingHeight)
+                    .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                    .padding( horizontal = settingHPadding)
+                    .clickable {
+                        viewModel.disconnectMirror()
                         viewModel.updateAuthStatus(false)
-                        navigator.push(LoginScreen(modifier = modifier, viewModel = viewModel))
+                        navigator.push(LoginScreen)
                     }
-                )
-            }
-            //  tapping this toggles our custom “dropdown”
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(settingSize), // set a fixed height matching your image’s aspect ratio
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.select_mirror),
-                    contentDescription = "select mirror",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable {
-                            navigator.push(MirrorsScreen(modifier = modifier, viewModel = viewModel))
-                        }
-                )
-
-                // Place the count at the right side, vertically centered
-                Text(
-                    text = "${mirrorDevices.size}",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 40.dp) // give a little padding from the right edge
-                )
-
-                if (showNet && !isConnected) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .align(Alignment.Center),
-                        color = Color.Red,
-                        strokeWidth = 4.dp,
-                        backgroundColor = Color.Gray
-                    )
-                }
-            }
-
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(settingSize), // set a fixed height matching your image’s aspect ratio
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.timeout),
-                    contentDescription = "screen timeout",
-                    contentScale = ContentScale.FillBounds,
-                )
-                Row(modifier.matchParentSize(),
+                    ,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Text("Add new mirror" , color = Color.White , fontSize = settingTextSize)
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "Add new mirror",
+                        tint = Color(0xFFD7C2FF),
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
 
-                    Box{
-                        // empty
+                Row(modifier = Modifier.fillMaxWidth()
+                    .height(settingHeight)
+                    .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                    .padding( horizontal = settingHPadding)
+                    .clickable {
+                        navigator.push(MirrorsScreen)// Removed modifier from push
                     }
-                    Box(contentAlignment = Alignment.Center){
-                        // Three Box for the three buttons
-                        Box(){
-                            Image(
-                                painter = painterResource(Res.drawable.previous_time),
-                                contentDescription = "Previous Time",
-                                contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.clickable {
-
-                                }
-                            )
-                        }
-
-                        Text("Time")
-
-                        Box(){
-                            Image(
-                                painter = painterResource(Res.drawable.next_time),
-                                contentDescription = "Next Time",
-                                contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.clickable {
-
-                                }
-                            )
-                        }
-                    }
-
+                    ,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Paired mirrors" , color = Color.White , fontSize = settingTextSize)
+                    Text(
+                        text = "${mirrorDevices.size}",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
                 }
 
 
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(settingSize), // set a fixed height matching your image’s aspect ratio
-                contentAlignment = Alignment.Center
+
+        }
+        // Screen timeout box
+        Box(
+            modifier = Modifier.fillMaxWidth()
+                .background( color = Color.Black.copy(.17f) , shape = RoundedCornerShape(settingBoxRound))
+            ,
+            contentAlignment = Alignment.Center
+        ) {
+
+            Column(modifier = Modifier.fillMaxWidth().padding(20.dp)
+                ,
+                verticalArrangement = Arrangement.spacedBy(spacedBy)
             ) {
-                Image(
-                    painter = painterResource(Res.drawable.version),
-                    contentDescription = "version",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier.clickable { /* ... */ }
-                )
+
+                // Header Of Screen Display
+                Text("Display" , color = Color.White)
+                Row(modifier = Modifier.fillMaxWidth()
+                    .height(settingHeight)
+                    .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                    .padding( horizontal = settingHPadding),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Screen timeout", color = Color.White , fontSize = settingTextSize)
+                    Box{
+                        TimerButton(
+                            onIncrement = {
+                                viewModel.nextTimer()
+                            },
+                            onDecrement = {
+                                viewModel.previousTimer()
+                            },
+                            toggle = timer,
+                            isToggle = true
+                        )
+                    }
+                }
+            }
+
+
+
+        }
+
+        // Mouse Setting
+        Box( modifier = Modifier.fillMaxWidth()
+            .background( color = Color.Black.copy(.17f) , shape = RoundedCornerShape(7))
+            ,
+            contentAlignment = Alignment.Center
+        ) {
+
+            Column(modifier = Modifier.fillMaxWidth().padding(20.dp)
+                ,
+                verticalArrangement = Arrangement.spacedBy(spacedBy)
+            ) {
+
+                // Mouse Header
+                Text("Mouse & Input", color = Color.White)
+                // Trackpad sensitivity setting
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .height(settingHeight)
+                        .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                        .padding(horizontal = settingHPadding),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Trackpad Sensitivity", color = Color.White , fontSize = settingTextSize)
+                    Box {
+                        TimerButton(
+                            onIncrement = {
+                                val nextIndex = (currentIndexOfTrackpad + 1).coerceAtMost(trackpadSensitivityList.lastIndex)
+                                viewModel.setTrackpadSensitivity(trackpadSensitivityList[nextIndex])
+                            },
+                            onDecrement = {
+                                val prevIndex = (currentIndexOfTrackpad - 1).coerceAtLeast(0)
+                                viewModel.setTrackpadSensitivity(trackpadSensitivityList[prevIndex])
+                            },
+                            value = ((trackpadSensitivity * 5) / 2 ),
+                        )
+                    }
+                }
+                // Scrollbar setting
+                Row(modifier = Modifier.fillMaxWidth()
+                    .height(settingHeight)
+                    .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                    .padding( horizontal = settingHPadding),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Scrollbar", color = Color.White)
+
+                    CustomSwitch(
+                        checked = scrollBar ,
+                        onCheckedChange = { viewModel.setScrollbar(!scrollBar) },
+                        trackWidth = 50.dp,
+                        trackHeight = 25.dp,
+                        thumbSize = 20.dp ,
+                        thumbIcon = Icons.Default.Check,
+                        trackColorUnchecked = Color(0xFF332537),
+                    )
+                    //println("scrollbar: $scrollBar")
+                }
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .height(settingHeight)
+                        .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                        .padding(horizontal = settingHPadding),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Scrollbar Position", color = Color.White , fontSize = settingTextSize)
+                    Box {
+                        TimerButton(
+                            onIncrement = {viewModel.setScrollbarPosition("Right")},
+                            onDecrement = { viewModel.setScrollbarPosition("Left")},
+                            toggle = scrollbarPosition,
+                            isToggle = true
+                        )
+                    }
+                }
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .height(settingHeight)
+                        .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                        .padding(horizontal = settingHPadding),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Scrollbar Sensitivity", color = Color.White , fontSize = settingTextSize)
+                    Box {
+                        TimerButton(
+                            onIncrement = {
+                                val nextIndex = (currentIndexOfScroll + 1).coerceAtMost(scrollSensitivityList.lastIndex)
+                                viewModel.setScrollSensitivity(scrollSensitivityList[nextIndex])
+                            },
+                            onDecrement = {
+                                val prevIndex = (currentIndexOfScroll - 1).coerceAtLeast(0)
+                                viewModel.setScrollSensitivity(scrollSensitivityList[prevIndex])
+                            },
+                            value = ((scrollSensitivity * 5) / 2),
+                        )
+                    }
+                }
+
+                Row(modifier = Modifier.fillMaxWidth()
+                    .height(settingHeight)
+                    .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                    .padding( horizontal = settingHPadding),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Scroll Direction Inverse", color = Color.White)
+
+
+                    CustomSwitch(
+                        checked = scrollDirection,
+                        onCheckedChange = { viewModel.setScrollDirection(!scrollDirection) },
+                        trackWidth = 50.dp,
+                        trackHeight = 25.dp,
+                        thumbSize = 20.dp ,
+                        thumbIcon = Icons.Default.Check,
+                        trackColorUnchecked = Color(0xFF332537),
+                    )
+                }
+
+
             }
 
         }
 
-        // -------------------------------------------------------
-        // OVERLAY: Centered, rounded “dropdown” when expanded = true
-        // -------------------------------------------------------
+        // About Device
+        Box(
+            modifier = Modifier.fillMaxWidth()
+                .background( color = Color.Black.copy(.17f) , shape = RoundedCornerShape(settingBoxRound))
+            ,
+            contentAlignment = Alignment.Center
+        ) {
 
+            Column(modifier = Modifier.fillMaxWidth().padding(20.dp)
+                ,
+                verticalArrangement = Arrangement.spacedBy(spacedBy)
+            ) {
+
+                // Header Of About Device
+                Text("About Device" , color = Color.White)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .height(settingHeight)
+                        .clickable {
+                            appVersion = "Version: ${viewModel.getAppVersion()}"
+                        }
+                        .background(color = settingColor, shape = RoundedCornerShape(settingRound))
+                        .padding(horizontal = settingHPadding),
+
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(appVersion, color = Color.White , fontSize = settingTextSize)
+                }
+
+
+                SendFileUi(viewModel = viewModel, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp))
+
+            }
+
+        }
     }
+
+
 }
