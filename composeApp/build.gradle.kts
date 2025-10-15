@@ -85,6 +85,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.encoding)
             implementation(libs.ktor.network)
+            implementation(compose.materialIconsExtended)
 
 
 
