@@ -9,6 +9,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -20,6 +21,7 @@ import cafe.adriel.voyager.navigator.*
 import com.floveit.floveitcontrol.navigations.helperfunction.tutorial.*
 import com.floveit.floveitcontrol.navigations.screens.MainDashboardScreen
 import com.floveit.floveitcontrol.platformSpecific.CameraView
+import com.floveit.floveitcontrol.platformSpecific.isAndroid
 import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
 import floveitcontrol.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
@@ -75,6 +77,8 @@ fun LoginPage(modifier: Modifier, viewModel: FLoveItControlViewModel){
             .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Spacer(Modifier.height( if(isAndroid()) 2.dp else 16.dp))
 
             Row(
                 Modifier

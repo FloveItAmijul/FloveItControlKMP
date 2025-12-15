@@ -186,7 +186,9 @@ fun WifiHidScreen(modifier: Modifier = Modifier ,viewModel: FLoveItControlViewMo
 
                     },
                     onFingerRelease = { value, position ->
-                        viewModel.sendData("MouseRelease") { }
+                        viewModel.sendData("MouseRelease") {
+                            println("Mouse Release Send")
+                        }
                     },
 
                     onSinglePressDrag = {value, pressed ->

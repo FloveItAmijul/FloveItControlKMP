@@ -19,17 +19,16 @@ fun SendFileUi(
     viewModel: FLoveItControlViewModel,
     modifier: Modifier
 ) {
-    val scope = rememberCoroutineScope()
+
     var status by remember { mutableStateOf<String?>(null) }
 
     // ⬇️ platform-provided launcher remembered as a lambda we can call from onClick
-    val launchPicker = launchFilePicker { pf: PickedFile ->
-        scope.launch {
-            viewModel.sendPickedFile(pf) { ok ->
-                status = if (ok) "Sent ✅" else "Failed ❌"
-            }
+    val launchPicker = launchFilePicker { pf ->
+        viewModel.sendPickedFile(pf) { ok ->
+            status = if (ok) "Sent ✅" else "Failed ❌"
         }
     }
+
 
     Row(modifier = modifier.fillMaxWidth()) {
         Button(

@@ -53,7 +53,7 @@ class SettingsRepository {
     }
 
     fun getTrackpadSensitivity(): Float {
-        return settings.getFloat(TRACKPAD_SENSITIVITY_KEY, defaultValue = 0F)
+        return settings.getFloat(TRACKPAD_SENSITIVITY_KEY, defaultValue = 2F)
     }
 
     fun setScrollbar(value: Boolean) {

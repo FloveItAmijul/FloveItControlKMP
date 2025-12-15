@@ -102,18 +102,20 @@ fun TouchPadTwo(
                                     }
                                 }
 
-                                // Break if all fingers lifted
-                                if (event.changes.all { !it.pressed }) {
-                                    fingerPosition = null
-                                    break
-                                }
-
                                 // Track finger release
                                 event.changes.forEach { pointer ->
                                     if (pointer.changedToUp()) {
                                         onFingerRelease(pointer.id.value.toInt(), pointer.position)
                                     }
                                 }
+
+                                // Break if all fingers lifted
+                                if (event.changes.all { !it.pressed }) {
+                                    fingerPosition = null
+                                    break
+                                }
+
+
 
                                 // Register new pointers
                                 event.changes.forEach { pointer ->

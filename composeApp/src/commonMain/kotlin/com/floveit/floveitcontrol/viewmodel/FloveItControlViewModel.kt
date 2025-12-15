@@ -236,10 +236,15 @@ class FLoveItControlViewModel(
         viewModelScope.launch {
             runCatching {
                 lightRepository.sendPickedFile(file)
-            }.onSuccess { onResult(true)}
-                .onFailure { onResult(false)}
+            }.onSuccess {
+                onResult(true)
+            }.onFailure { e ->
+                e.printStackTrace() // or Log.e("FileSender", "send failed", e)
+                onResult(false)
+            }
         }
     }
+
 
 
     fun logout(){

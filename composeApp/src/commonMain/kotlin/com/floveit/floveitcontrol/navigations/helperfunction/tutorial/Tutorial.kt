@@ -88,7 +88,7 @@ fun Tutorial(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-
+            Spacer(Modifier.height( if(isAndroid()) 2.dp else 18.dp))
 
             // 1) Top row: back button
             Row(

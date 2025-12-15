@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
     id("org.jetbrains.kotlin.native.cocoapods")
-    id("app.cash.sqldelight") version "2.1.0"
+    id("app.cash.sqldelight") version "2.2.1"
 }
 
 kotlin {
@@ -37,7 +37,7 @@ kotlin {
         homepage = "https://floveit.com"
         version = "1.0"
         ios.deploymentTarget = "15.0"
-        podfile = project.file("../iosApp/Podfile")      // 👈 👈 👈 MISSING in your file!
+        podfile = project.file("../iosApp/Podfile")
         framework {
             baseName = "ComposeApp"
             isStatic = true
