@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import cafe.adriel.voyager.navigator.*
+import com.floveit.floveitcontrol.platformSpecific.isAndroid
 import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
 import floveitcontrol.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
@@ -40,6 +42,7 @@ fun SelectMirror(modifier: Modifier = Modifier , viewModel: FLoveItControlViewMo
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        Spacer(Modifier.height( if(isAndroid()) 2.dp else 18.dp))
 
         Row(modifier.fillMaxWidth()){
             Icon(
@@ -48,7 +51,7 @@ fun SelectMirror(modifier: Modifier = Modifier , viewModel: FLoveItControlViewMo
                 tint = Color.White,
                 modifier = Modifier.clickable {
                     navigator.pop()
-                }
+                }.size(25.dp)
             )
         }
 

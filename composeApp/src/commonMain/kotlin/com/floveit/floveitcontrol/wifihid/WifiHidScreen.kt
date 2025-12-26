@@ -7,10 +7,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OfflineShare
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FolderShared
+import androidx.compose.material.icons.filled.OfflineShare
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -20,14 +25,12 @@ import androidx.compose.ui.unit.*
 import com.floveit.floveitcontrol.platformSpecific.isAndroid
 import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
 import com.floveit.floveitcontrol.wifihid.helperfunction.AmijulSlider
+import com.floveit.floveitcontrol.wifihid.helperfunction.InputRow
 import com.floveit.floveitcontrol.wifihid.helperfunction.ScalableButton
 import com.floveit.floveitcontrol.wifihid.helperfunction.TouchPadTwo
 import floveitcontrol.composeapp.generated.resources.*
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock.*
-import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
-import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -49,14 +52,6 @@ fun WifiHidScreen(modifier: Modifier = Modifier ,viewModel: FLoveItControlViewMo
     val scrollPosition by viewModel.scrollPosition.collectAsState()
     val scrollDirection by viewModel.scrollDirection.collectAsState()
 
-    var lastHapticTime by remember { mutableStateOf(Instant.DISTANT_PAST) }
-
-//    val currentTime = System.now()
-//
-//    if (currentTime - lastHapticTime >= kotlinx.datetime.Duration.parse("1s")) {
-//        hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-//        lastHapticTime = currentTime
-//    }
 
 
 
@@ -82,77 +77,17 @@ fun WifiHidScreen(modifier: Modifier = Modifier ,viewModel: FLoveItControlViewMo
         ) {
             //Text("Wi-Fi Remote")
             // Keyboard
-            Row(Modifier.fillMaxWidth()) {
-                Box(modifier = Modifier.fillMaxWidth()){
-                    Image(
-                        painter = painterResource(resource = Res.drawable.input),
-                        contentDescription = "Input",
-                        contentScale = ContentScale.FillBounds,
-                        modifier = modifier.matchParentSize()
-                    )
-                    TextField(
-                        value = text,
-                        onValueChange = { text = it},
-                        shape = RoundedCornerShape(30),
-                        leadingIcon = {
-                            Box(
-                                modifier = Modifier
-                                    .size(25.dp) // defines actual clickable/touch area
-                                    .offset { IntOffset(offsetX.value.roundToInt(), 0) }
-                                    .clickable(
-                                        indication = null, // 👈 disables ripple
-                                        interactionSource = remember { MutableInteractionSource() } // required when disabling indication
-                                    ) {
-                                        if (text.isNotEmpty()) {
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            text = ""
-                                            scope.launch { shakeIcon() }
-                                        }
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Erase",
-                                    tint = if (text.isEmpty()) Color(0xFF696183) else Color.White,
-                                    modifier = Modifier.matchParentSize() // just icon size, inside the box
-                                )
-                            }
-                        },
 
-                        singleLine = true,
+            InputRow(
+                modifier = modifier,
+                offsetX = offsetX.asState(),
+                onShakeRequest = { scope.launch { shakeIcon() } },
+                onHaptic = { type -> hapticFeedback.performHapticFeedback(type) },
+                onSendText = { msg -> viewModel.sendData("Keyboard$msg") {} },
+                onSendFile = { file, onResult -> viewModel.sendPickedFile(file, onResult) }
+            )
 
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Send,
-                                contentDescription = "Send Icon",
-                                tint = Color.White,
-                                modifier = modifier.clickable {
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    viewModel.sendData("Keyboard$text"){}
-                                }.size(25.dp)
-                            )
-                        },
-                        colors = TextFieldDefaults.textFieldColors(
-                            cursorColor = Color.White,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            backgroundColor = Color.Transparent,
-                            textColor = Color.White,
-                            placeholderColor = Color.White,
-                            disabledIndicatorColor = Color.White,
-                            errorIndicatorColor = Color.White,
-                        ),
-                        placeholder = {
-                            Text("Input Text" , color = Color.White)
-                        },
-                        modifier = modifier.fillMaxWidth(),
 
-                        )
-
-                }
-
-            }
             Spacer(modifier = modifier.height(if(isAndroid()) 15.dp else (iosSpace)))
             // Mouse Pad
             Row(modifier.fillMaxWidth().height(maxHeight * 0.47f)
@@ -523,3 +458,4 @@ fun WifiHidScreen(modifier: Modifier = Modifier ,viewModel: FLoveItControlViewMo
     }
 
 }
+

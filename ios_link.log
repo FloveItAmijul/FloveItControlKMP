@@ -1,0 +1,359 @@
+Initialized native services in: /Users/amijul/.gradle/native
+Initialized jansi services in: /Users/amijul/.gradle/native
+The client will now receive all logging from the daemon (pid: 6834). The daemon log file: /Users/amijul/.gradle/daemon/8.14.3/daemon-6834.out.log
+Starting 9th build in daemon [uptime: 14 mins 8.884 secs, performance: 100%, GC rate: 0.00/s, heap usage: 0% of 6 GiB]
+Using 10 worker leases.
+Now considering [/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Settings evaluated using settings file '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/settings.gradle.kts'.
+Type-safe project accessors is an incubating feature.
+Projects loaded. Root project using build file '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/build.gradle.kts'.
+Included projects: [root project 'FloveItControl', project ':composeApp']
+
+> Configure project :
+Evaluating root project 'FloveItControl' using build file '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/build.gradle.kts'.
+Resolved plugin [id: 'com.android.application', version: '8.13.2', apply: false]
+Resolved plugin [id: 'com.android.library', version: '8.13.2', apply: false]
+Resolved plugin [id: 'org.jetbrains.compose', version: '1.9.3', apply: false]
+Resolved plugin [id: 'org.jetbrains.kotlin.plugin.compose', version: '2.2.21', apply: false]
+Resolved plugin [id: 'org.jetbrains.kotlin.multiplatform', version: '2.2.21', apply: false]
+
+> Configure project :composeApp
+Evaluating project ':composeApp' using build file '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build.gradle.kts'.
+Resolved plugin [id: 'org.jetbrains.kotlin.multiplatform', version: '2.2.21']
+Resolved plugin [id: 'com.android.application', version: '8.13.2']
+Resolved plugin [id: 'org.jetbrains.compose', version: '1.9.3']
+Resolved plugin [id: 'org.jetbrains.kotlin.plugin.compose', version: '2.2.21']
+Resolved plugin [id: 'org.jetbrains.kotlin.plugin.serialization', version: '2.2.21']
+Resolved plugin [id: 'org.jetbrains.kotlin.native.cocoapods']
+Resolved plugin [id: 'app.cash.sqldelight', version: '2.2.1']
+Build c4efdbf2-1154-4961-be47-e97288543d48 is started
+Using Kotlin Gradle Plugin gradle813 variant
+Using default execution profile
+Configure multi-module compose resources
+Configure compose resources generation
+Configure 'map(provider(?))' class generation for commonMain
+Configure resource accessors generation for commonMain
+Configure resource accessors generation for commonTest
+Configure expect resource collectors generation for commonMain
+Configure compose resources with AndroidComponentsExtension
+Configure resource accessors generation for androidInstrumentedTest
+Configure resource accessors generation for androidMain
+Configure resource accessors generation for androidUnitTest
+Configure actual resource collectors generation for androidMain
+Configure resource accessors generation for iosX64Main
+Configure resource accessors generation for iosX64Test
+Configure actual resource collectors generation for iosX64Main
+Configure main resources for 'iosX64' target
+Configure KMP component publication for 'iosX64'
+Collect resolved main resources for 'iosX64'
+Configure test resources for 'iosX64' target
+Configure resource accessors generation for iosArm64Main
+Configure resource accessors generation for iosArm64Test
+Configure actual resource collectors generation for iosArm64Main
+Configure main resources for 'iosArm64' target
+Configure KMP component publication for 'iosArm64'
+Collect resolved main resources for 'iosArm64'
+Configure test resources for 'iosArm64' target
+Configure resource accessors generation for iosSimulatorArm64Main
+Configure resource accessors generation for iosSimulatorArm64Test
+Configure actual resource collectors generation for iosSimulatorArm64Main
+Configure main resources for 'iosSimulatorArm64' target
+Configure KMP component publication for 'iosSimulatorArm64'
+Collect resolved main resources for 'iosSimulatorArm64'
+Configure test resources for 'iosSimulatorArm64' target
+Configure resource accessors generation for iosMain
+Configure debug resources for 'android' target
+Configure debugAndroidTest resources for 'android' target
+Configure release resources for 'android' target
+Configure resource accessors generation for androidInstrumentedTestDebug
+Configure resource accessors generation for androidUnitTestDebug
+Configure resource accessors generation for androidDebug
+Configure resource accessors generation for androidUnitTestRelease
+Configure resource accessors generation for androidRelease
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+[:composeApp] commonizeCInterop task registration enabled.
+Check that new 'org.jetbrains.kotlin.plugin.compose' was applied
+SQLDelight Gradle plugin was applied but there are no databases set up.
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Configure resource accessors generation for nativeMain
+Configure resource accessors generation for appleMain
+Configure resource accessors generation for nativeTest
+Configure resource accessors generation for appleTest
+Configure resource accessors generation for iosTest
+Detected Android Gradle Plugin compose compiler configuration
+[:composeApp] commonizeCInterop task registration enabled.
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+[:composeApp] commonizeCInterop task registration enabled.
+Detected Android Gradle Plugin compose compiler configuration
+[:composeApp] commonizeCInterop task registration enabled.
+All projects evaluated.
+Task path ':composeApp:linkPodReleaseFrameworkIosX64' matched project ':composeApp'
+Task name matched 'linkPodReleaseFrameworkIosX64'
+Selected primary task 'linkPodReleaseFrameworkIosX64' from project :composeApp
+Tasks to be executed: [task ':composeApp:kmpPartiallyResolvedDependenciesChecker', task ':composeApp:checkKotlinGradlePluginConfigurationErrors', task ':composeApp:downloadKotlinNativeDistribution', task ':composeApp:convertXmlValueResourcesForAppleMain', task ':composeApp:copyNonXmlValueResourcesForAppleMain', task ':composeApp:prepareComposeResourcesTaskForAppleMain', task ':composeApp:generateResourceAccessorsForAppleMain', task ':composeApp:convertXmlValueResourcesForCommonMain', task ':composeApp:copyNonXmlValueResourcesForCommonMain', task ':composeApp:prepareComposeResourcesTaskForCommonMain', task ':composeApp:generateResourceAccessorsForCommonMain', task ':composeApp:convertXmlValueResourcesForIosMain', task ':composeApp:copyNonXmlValueResourcesForIosMain', task ':composeApp:prepareComposeResourcesTaskForIosMain', task ':composeApp:generateResourceAccessorsForIosMain', task ':composeApp:convertXmlValueResourcesForIosX64Main', task ':composeApp:copyNonXmlValueResourcesForIosX64Main', task ':composeApp:prepareComposeResourcesTaskForIosX64Main', task ':composeApp:generateResourceAccessorsForIosX64Main', task ':composeApp:convertXmlValueResourcesForNativeMain', task ':composeApp:copyNonXmlValueResourcesForNativeMain', task ':composeApp:prepareComposeResourcesTaskForNativeMain', task ':composeApp:generateResourceAccessorsForNativeMain', task ':composeApp:generateActualResourceCollectorsForIosX64Main', task ':composeApp:generateComposeResClass', task ':composeApp:generateExpectResourceCollectorsForCommonMain', task ':composeApp:compileKotlinIosX64', task ':composeApp:linkPodReleaseFrameworkIosX64']
+Tasks that were excluded: []
+Resolve mutations for :composeApp:kmpPartiallyResolvedDependenciesChecker (Thread[Execution worker,5,main]) started.
+:composeApp:kmpPartiallyResolvedDependenciesChecker (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:kmpPartiallyResolvedDependenciesChecker
+Caching disabled for task ':composeApp:kmpPartiallyResolvedDependenciesChecker' because:
+  Build cache is disabled
+Task ':composeApp:kmpPartiallyResolvedDependenciesChecker' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Resource missing. [HTTP GET: https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.6.4-native-mt/kotlinx-coroutines-core-1.6.4-native-mt.pom]
+Execution stopped by some action with message: null
+Resolve mutations for :composeApp:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':composeApp:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :composeApp:downloadKotlinNativeDistribution (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:downloadKotlinNativeDistribution (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:downloadKotlinNativeDistribution UP-TO-DATE
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Caching disabled for task ':composeApp:downloadKotlinNativeDistribution' because:
+  Build cache is disabled
+Skipping task ':composeApp:downloadKotlinNativeDistribution' as it is up-to-date.
+Resolve mutations for :composeApp:convertXmlValueResourcesForAppleMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:convertXmlValueResourcesForAppleMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:convertXmlValueResourcesForAppleMain NO-SOURCE
+file or directory '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build/generated/compose/resourceGenerator/preparedResources/appleMain/composeResources', not found
+Skipping task ':composeApp:convertXmlValueResourcesForAppleMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:copyNonXmlValueResourcesForAppleMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:copyNonXmlValueResourcesForAppleMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:copyNonXmlValueResourcesForAppleMain NO-SOURCE
+file or directory '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build/generated/compose/resourceGenerator/preparedResources/appleMain/composeResources', not found
+Skipping task ':composeApp:copyNonXmlValueResourcesForAppleMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:prepareComposeResourcesTaskForAppleMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:prepareComposeResourcesTaskForAppleMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:prepareComposeResourcesTaskForAppleMain NO-SOURCE
+Skipping task ':composeApp:prepareComposeResourcesTaskForAppleMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:generateResourceAccessorsForAppleMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:generateResourceAccessorsForAppleMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:generateResourceAccessorsForAppleMain NO-SOURCE
+Skipping task ':composeApp:generateResourceAccessorsForAppleMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:convertXmlValueResourcesForCommonMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:convertXmlValueResourcesForCommonMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:convertXmlValueResourcesForCommonMain NO-SOURCE
+Skipping task ':composeApp:convertXmlValueResourcesForCommonMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:copyNonXmlValueResourcesForCommonMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:copyNonXmlValueResourcesForCommonMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:copyNonXmlValueResourcesForCommonMain UP-TO-DATE
+Caching disabled for task ':composeApp:copyNonXmlValueResourcesForCommonMain' because:
+  Build cache is disabled
+  Caching has not been enabled for the task
+Skipping task ':composeApp:copyNonXmlValueResourcesForCommonMain' as it is up-to-date.
+Resolve mutations for :composeApp:prepareComposeResourcesTaskForCommonMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:prepareComposeResourcesTaskForCommonMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:prepareComposeResourcesTaskForCommonMain UP-TO-DATE
+Caching disabled for task ':composeApp:prepareComposeResourcesTaskForCommonMain' because:
+  Build cache is disabled
+  Caching has not been enabled for the task
+Skipping task ':composeApp:prepareComposeResourcesTaskForCommonMain' as it is up-to-date.
+Resolve mutations for :composeApp:generateResourceAccessorsForCommonMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:generateResourceAccessorsForCommonMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:generateResourceAccessorsForCommonMain UP-TO-DATE
+Caching disabled for task ':composeApp:generateResourceAccessorsForCommonMain' because:
+  Build cache is disabled
+  Caching has not been enabled for the task
+Skipping task ':composeApp:generateResourceAccessorsForCommonMain' as it is up-to-date.
+Resolve mutations for :composeApp:convertXmlValueResourcesForIosMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:convertXmlValueResourcesForIosMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:convertXmlValueResourcesForIosMain NO-SOURCE
+file or directory '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build/generated/compose/resourceGenerator/preparedResources/iosMain/composeResources', not found
+Skipping task ':composeApp:convertXmlValueResourcesForIosMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:copyNonXmlValueResourcesForIosMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:copyNonXmlValueResourcesForIosMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:copyNonXmlValueResourcesForIosMain NO-SOURCE
+file or directory '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build/generated/compose/resourceGenerator/preparedResources/iosMain/composeResources', not found
+Skipping task ':composeApp:copyNonXmlValueResourcesForIosMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:prepareComposeResourcesTaskForIosMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:prepareComposeResourcesTaskForIosMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:prepareComposeResourcesTaskForIosMain NO-SOURCE
+Skipping task ':composeApp:prepareComposeResourcesTaskForIosMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:generateResourceAccessorsForIosMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:generateResourceAccessorsForIosMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:generateResourceAccessorsForIosMain NO-SOURCE
+Skipping task ':composeApp:generateResourceAccessorsForIosMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:convertXmlValueResourcesForIosX64Main (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:convertXmlValueResourcesForIosX64Main (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:convertXmlValueResourcesForIosX64Main NO-SOURCE
+file or directory '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build/generated/compose/resourceGenerator/preparedResources/iosX64Main/composeResources', not found
+Skipping task ':composeApp:convertXmlValueResourcesForIosX64Main' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:copyNonXmlValueResourcesForIosX64Main (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:copyNonXmlValueResourcesForIosX64Main (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:copyNonXmlValueResourcesForIosX64Main NO-SOURCE
+file or directory '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build/generated/compose/resourceGenerator/preparedResources/iosX64Main/composeResources', not found
+Skipping task ':composeApp:copyNonXmlValueResourcesForIosX64Main' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:prepareComposeResourcesTaskForIosX64Main (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:prepareComposeResourcesTaskForIosX64Main (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:prepareComposeResourcesTaskForIosX64Main NO-SOURCE
+Skipping task ':composeApp:prepareComposeResourcesTaskForIosX64Main' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:generateResourceAccessorsForIosX64Main (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:generateResourceAccessorsForIosX64Main (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:generateResourceAccessorsForIosX64Main NO-SOURCE
+Skipping task ':composeApp:generateResourceAccessorsForIosX64Main' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:convertXmlValueResourcesForNativeMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:convertXmlValueResourcesForNativeMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:convertXmlValueResourcesForNativeMain NO-SOURCE
+file or directory '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build/generated/compose/resourceGenerator/preparedResources/nativeMain/composeResources', not found
+Skipping task ':composeApp:convertXmlValueResourcesForNativeMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:copyNonXmlValueResourcesForNativeMain (Thread[Execution worker Thread 7,5,main]) started.
+:composeApp:copyNonXmlValueResourcesForNativeMain (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :composeApp:copyNonXmlValueResourcesForNativeMain NO-SOURCE
+file or directory '/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8/composeApp/build/generated/compose/resourceGenerator/preparedResources/nativeMain/composeResources', not found
+Skipping task ':composeApp:copyNonXmlValueResourcesForNativeMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:prepareComposeResourcesTaskForNativeMain (Thread[Execution worker,5,main]) started.
+:composeApp:prepareComposeResourcesTaskForNativeMain (Thread[Execution worker,5,main]) started.
+
+> Task :composeApp:prepareComposeResourcesTaskForNativeMain NO-SOURCE
+Skipping task ':composeApp:prepareComposeResourcesTaskForNativeMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:generateResourceAccessorsForNativeMain (Thread[Execution worker,5,main]) started.
+:composeApp:generateResourceAccessorsForNativeMain (Thread[Execution worker,5,main]) started.
+
+> Task :composeApp:generateResourceAccessorsForNativeMain NO-SOURCE
+Skipping task ':composeApp:generateResourceAccessorsForNativeMain' as it has no source files and no previous output files.
+Resolve mutations for :composeApp:generateActualResourceCollectorsForIosX64Main (Thread[Execution worker Thread 3,5,main]) started.
+:composeApp:generateActualResourceCollectorsForIosX64Main (Thread[Execution worker Thread 3,5,main]) started.
+
+> Task :composeApp:generateActualResourceCollectorsForIosX64Main UP-TO-DATE
+Caching disabled for task ':composeApp:generateActualResourceCollectorsForIosX64Main' because:
+  Build cache is disabled
+  Caching has not been enabled for the task
+Skipping task ':composeApp:generateActualResourceCollectorsForIosX64Main' as it is up-to-date.
+Resolve mutations for :composeApp:generateComposeResClass (Thread[Execution worker Thread 3,5,main]) started.
+:composeApp:generateComposeResClass (Thread[Execution worker Thread 3,5,main]) started.
+
+> Task :composeApp:generateComposeResClass UP-TO-DATE
+Caching disabled for task ':composeApp:generateComposeResClass' because:
+  Build cache is disabled
+  Caching has not been enabled for the task
+Skipping task ':composeApp:generateComposeResClass' as it is up-to-date.
+Resolve mutations for :composeApp:generateExpectResourceCollectorsForCommonMain (Thread[Execution worker Thread 3,5,main]) started.
+:composeApp:generateExpectResourceCollectorsForCommonMain (Thread[Execution worker Thread 3,5,main]) started.
+
+> Task :composeApp:generateExpectResourceCollectorsForCommonMain UP-TO-DATE
+Caching disabled for task ':composeApp:generateExpectResourceCollectorsForCommonMain' because:
+  Build cache is disabled
+  Caching has not been enabled for the task
+Skipping task ':composeApp:generateExpectResourceCollectorsForCommonMain' as it is up-to-date.
+Resolve mutations for :composeApp:compileKotlinIosX64 (Thread[Execution worker Thread 3,5,main]) started.
+:composeApp:compileKotlinIosX64 (Thread[Execution worker Thread 3,5,main]) started.
+
+> Task :composeApp:compileKotlinIosX64 UP-TO-DATE
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Caching disabled for task ':composeApp:compileKotlinIosX64' because:
+  Build cache is disabled
+Skipping task ':composeApp:compileKotlinIosX64' as it is up-to-date.
+Resolve mutations for :composeApp:linkPodReleaseFrameworkIosX64 (Thread[Execution worker Thread 3,5,main]) started.
+:composeApp:linkPodReleaseFrameworkIosX64 (Thread[Execution worker Thread 3,5,main]) started.
+
+> Task :composeApp:linkPodReleaseFrameworkIosX64
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Acquire lock: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock ...
+Kotlin Native Bundle: Lock acquired: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Kotlin Native Bundle: Lock released: /Users/amijul/.konan/kotlin-native-prebuilt-macos-aarch64-2.2.21/.lock
+Caching disabled for task ':composeApp:linkPodReleaseFrameworkIosX64' because:
+  Build cache is disabled
+  'Task outputs cacheable' not satisfied
+Task ':composeApp:linkPodReleaseFrameworkIosX64' is not up-to-date because:
+  Task has failed previously.
+w: Cannot infer a bundle ID from packages of source files and exported dependencies, use the bundle name instead: ComposeApp. Please specify the bundle ID explicitly using the -Xbinary=bundleId=<id> compiler flag.
+Build c4efdbf2-1154-4961-be47-e97288543d48 is closed
+
+BUILD SUCCESSFUL in 2m 25s
+10 actionable tasks: 2 executed, 8 up-to-date
+Watched directory hierarchies: [/Volumes/Desk_WD/Personal Drive/Android Studio Project/FLoveIt Remote Version 1.0.8]

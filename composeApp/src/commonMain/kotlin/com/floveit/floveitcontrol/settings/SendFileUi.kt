@@ -10,7 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.floveit.floveitcontrol.filetransfer.PickedFile
-import com.floveit.floveitcontrol.platformSpecific.launchFilePicker
+import com.floveit.floveitcontrol.platformSpecific.LaunchFilePicker
 import com.floveit.floveitcontrol.viewmodel.FLoveItControlViewModel
 import kotlinx.coroutines.launch
 
@@ -23,7 +23,7 @@ fun SendFileUi(
     var status by remember { mutableStateOf<String?>(null) }
 
     // ⬇️ platform-provided launcher remembered as a lambda we can call from onClick
-    val launchPicker = launchFilePicker { pf ->
+    val launchPicker = LaunchFilePicker { pf ->
         viewModel.sendPickedFile(pf) { ok ->
             status = if (ok) "Sent ✅" else "Failed ❌"
         }

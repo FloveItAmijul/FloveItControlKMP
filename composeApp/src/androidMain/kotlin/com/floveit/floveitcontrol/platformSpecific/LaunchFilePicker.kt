@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.floveit.floveitcontrol.filetransfer.PickedFile
 
 @Composable
-actual fun launchFilePicker(onPicked: (PickedFile) -> Unit): () -> Unit {
+actual fun LaunchFilePicker(onPicked: (PickedFile) -> Unit): () -> Unit {
 
     val context = LocalContext.current
     val cr = context.contentResolver
@@ -41,7 +41,9 @@ actual fun launchFilePicker(onPicked: (PickedFile) -> Unit): () -> Unit {
     }
 }
 
-private fun resolveDisplayName(cr: ContentResolver, uri: Uri): String? {
+
+
+fun resolveDisplayName(cr: ContentResolver, uri: Uri): String? {
     var cursor: Cursor? = null
     return try {
         cursor = cr.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
